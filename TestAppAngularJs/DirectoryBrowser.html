@@ -6,18 +6,34 @@
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
 </head>
 <body ng-app="DirectoryBrowser">
-    <div ng-controller="ContentController">
-        <p>
+    <div ng-controller="ContentController" style="width: 700px; margin: auto">
+        <div style="width: 300px; margin: auto">
+            <table border="1">
+                <tr>
+                    <th>Less 10 Mb</th>
+                    <th>10 - 50 Mb</th>
+                    <th>More 100 Mb</th>
+                </tr>
+                <tr>
+                    <td>{{counts.Less10Mb}}</td>
+                    <td>{{counts.More10MbLess50Mb}}</td>
+                    <td>{{counts.More100Mb}}</td>
+                </tr>
+            </table>
+        </div>
+        <!--<p>
             Less 10 Mb: {{counts.Less10Mb}}
             <br/>
             10 - 50 Mb: {{counts.More10MbLess50Mb}}
             <br/>
             More 100 Mb: {{counts.More100Mb}}
             <br />
-        </p>
+        </p>-->
         <span>Current Directory: {{data.CurrentPath}} <br /></span>
-        <a ng-repeat="dir in data.Directories" href="{{dir.Path}}" ng-click="OnLinkClick(this)">{{dir.Name}} <br /></a>
-        <span ng-repeat="file in data.Files">{{file.Name}} <br /></span>
+        <div style="background: #EFF8FB">
+            <a ng-repeat="dir in data.Directories" href="{{dir.Path}}" ng-click="OnLinkClick(this)">{{dir.Name}} <br /></a>
+            <span ng-repeat="file in data.Files">{{file.Name}} <br /></span>
+        </div>
     </div>
 
 
@@ -32,7 +48,7 @@
             }).
             error(function (data, status, headers, config) {
                 //debugger
-                alert("error");
+                alert("access denyed");
             });
 
             $scope.OnLinkClick = function (object) {
@@ -47,7 +63,7 @@
                     }).
                     error(function (data, status, headers, config) {
                         //debugger
-                        alert("error");
+                        //alert("access denyed");
                     });
                 }
                 else {
@@ -58,14 +74,14 @@
                     }).
                     error(function (data, status, headers, config) {
                         //debugger
-                        alert("error");
+                        alert("access denyed");
                     });
                     $http.get('http://localhost:12601/api/file?path=' + object.dir.Path).
                     success(function (data, status, headers, config) {
                         $scope.counts = data;
                     }).
                     error(function (data, status, headers, config) {
-                        alert("files not count");
+
                     });
                 }
                 
