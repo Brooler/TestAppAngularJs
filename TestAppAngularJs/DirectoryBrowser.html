@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+</head>
+<body ng-app="DirectoryBrowser">
+    <div ng-controller="ContentController">
+        <p>
+            Less 10 Mb: {{counts.Less10Mb}}
+            <br/>
+            10 - 50 Mb: {{counts.More10MbLess50Mb}}
+            <br/>
+            More 100 Mb: {{counts.More100Mb}}
+            <br />
+        </p>
+        <span>Current Directory: {{data.CurrentPath}} <br /></span>
+        <a ng-repeat="dir in data.Directories" href="{{dir.Path}}" ng-click="OnLinkClick(this)">{{dir.Name}} <br /></a>
+        <span ng-repeat="file in data.Files">{{file.Name}} <br /></span>
+    </div>
+
+
+    <script>
+        var app = angular.module("DirectoryBrowser", []);
+        app.controller("ContentController", function ($scope, $http) {
+            //debugger
+            $http.get('http://localhost:12601/api/directory').
+            success(function (data, status, headers, config) {
+                //debugger
+                $scope.data = data;
+            }).
+            error(function (data, status, headers, config) {
+                //debugger
+                alert("error");
+            });
+
+            $scope.OnLinkClick = function (object) {
+                //$scope.counts.Less10Mb = 0;
+                //$scope.counts.More10MbLess50Mb = 0;
+                //$scope.counts.More100Mb = 0;
+                if (object.dir.Path == "") {
+                    $http.get('http://localhost:12601/api/directory').
+                    success(function (data, status, headers, config) {
+                        //debugger
+                        $scope.data = data;
+                    }).
+                    error(function (data, status, headers, config) {
+                        //debugger
+                        alert("error");
+                    });
+                }
+                else {
+                    $http.get('http://localhost:12601/api/directory?path=' + object.dir.Path).
+                    success(function (data, status, headers, config) {
+                        //debugger
+                        $scope.data = data;
+                    }).
+                    error(function (data, status, headers, config) {
+                        //debugger
+                        alert("error");
+                    });
+                    $http.get('http://localhost:12601/api/file?path=' + object.dir.Path).
+                    success(function (data, status, headers, config) {
+                        $scope.counts = data;
+                    }).
+                    error(function (data, status, headers, config) {
+                        alert("files not count");
+                    });
+                }
+                
+            };
+        });
+    </script>
+</body>
+</html>
