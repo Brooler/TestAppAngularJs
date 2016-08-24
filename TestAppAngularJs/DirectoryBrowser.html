@@ -41,48 +41,80 @@
         var app = angular.module("DirectoryBrowser", []);
         app.controller("ContentController", function ($scope, $http) {
             //debugger
-            $http.get('http://localhost:12601/api/directory').
-            success(function (data, status, headers, config) {
-                //debugger
-                $scope.data = data;
-            }).
-            error(function (data, status, headers, config) {
-                //debugger
-                alert("access denyed");
-            });
+
+            var GetDisks = function () {
+                $http.get('http://localhost:12601/api/directory').
+                success(function (data, status, headers, config) {
+                    //debugger
+                    $scope.data = data;
+                    //file count notification
+                    $scope.counts = {
+                        "Less10Mb": "select disk for file info",
+                        "More10MbLess50Mb": "...",
+                        "More100Mb": "..."
+                    };
+                    //-------------------------
+                }).
+                error(function (data, status, headers, config) {
+                    //debugger
+                    alert("access denyed");
+                });
+            };
+
+            var GetDirectoryInfo = function (path) {
+                debugger
+                $http.get('http://localhost:12601/api/directory?path=' + path).
+                    success(function (data, status, headers, config) {
+                        //debugger
+                        $scope.data = data;
+                        
+                        //get files count
+                        GetFilesCounts(path);
+                        //---------------
+                    }).
+                    error(function (data, status, headers, config) {
+                        //debugger
+                        alert("access denyed");
+                    });
+                debugger
+            };
+
+            var GetFilesCounts = function (path) {
+                //showing temporary data
+                $scope.counts = {
+                    "Less10Mb": "counting...",
+                    "More10MbLess50Mb": "counting...",
+                    "More100Mb": "counting..."
+                };
+                //----------------------
+                $http.get('http://localhost:12601/api/file?path=' + path).
+                success(function (data, status, headers, config) {
+                    $scope.counts = data;
+                }).
+                error(function (data, status, headers, config) {
+                    //showing message when error
+                    $scope.counts = {
+                        "Less10Mb": "counting failed",
+                        "More10MbLess50Mb": "...",
+                        "More100Mb": "..."
+                    };
+                    //----------------------
+                });
+            };
+
+            GetDisks();
 
             $scope.OnLinkClick = function (object) {
                 //$scope.counts.Less10Mb = 0;
                 //$scope.counts.More10MbLess50Mb = 0;
                 //$scope.counts.More100Mb = 0;
                 if (object.dir.Path == "") {
-                    $http.get('http://localhost:12601/api/directory').
-                    success(function (data, status, headers, config) {
-                        //debugger
-                        $scope.data = data;
-                    }).
-                    error(function (data, status, headers, config) {
-                        //debugger
-                        //alert("access denyed");
-                    });
+                    GetDisks();
                 }
                 else {
-                    $http.get('http://localhost:12601/api/directory?path=' + object.dir.Path).
-                    success(function (data, status, headers, config) {
-                        //debugger
-                        $scope.data = data;
-                    }).
-                    error(function (data, status, headers, config) {
-                        //debugger
-                        alert("access denyed");
-                    });
-                    $http.get('http://localhost:12601/api/file?path=' + object.dir.Path).
-                    success(function (data, status, headers, config) {
-                        $scope.counts = data;
-                    }).
-                    error(function (data, status, headers, config) {
-
-                    });
+                    debugger
+                    GetDirectoryInfo(object.dir.Path);
+                    debugger
                 }
                 
             };
